@@ -1,0 +1,120 @@
+---
+import Navbar from "../components/Navbar.astro";
+
+const { content } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <title>{content.title}</title>
+
+    <meta name="description" content={content.description} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/ico" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Open Graph Meta Tags for Social Sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={content.title} />
+    <meta property="og:description" content={content.description} />
+    <meta property="og:image" content="/banner.webp" />
+    <meta
+      property="og:url"
+      content="https://yapboard.chamanbudhathoki.com.np"
+    />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={content.title} />
+    <meta name="twitter:description" content={content.description} />
+    <meta name="twitter:image" content="/banner.webp" />
+
+    <!-- SEO and Performance -->
+    <meta
+      name="keywords"
+      content="Yapboard, whiteboard, collaborative tools, AI whiteboard, team collaboration, online whiteboard, free"
+    />
+    <meta name="author" content="Yapboard Team" />
+    <meta name="robots" content="index, follow" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <link rel="stylesheet" href="/styles/global.css" />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <div class="w-full h-screen bg-[#fafaf8] overflow-y-auto">
+      <div class="max-w-[750px] mx-auto w-full flex flex-col gap-6 pb-8 px-2">
+        <Navbar />
+        <h1 class="text-4xl py-7 border-b-2">{content.title}</h1>
+        <article class="markdown-content">
+          <slot />
+        </article>
+      </div>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  .markdown-content h2,
+  .markdown-content h3,
+  .markdown-content {
+    @apply text-[#2c3e50] pt-2.5 pb-1.5 font-normal;
+  }
+
+  strong {
+    @apply font-medium;
+  }
+
+  .markdown-content h1 {
+    @apply text-2xl font-normal border-b-2 border-[#ddd] mb-2.5 pb-4;
+  }
+
+  .markdown-content h2 {
+    @apply text-2xl mt-5;
+  }
+
+  .markdown-content h3 {
+    @apply text-xl;
+  }
+
+  .markdown-content p,
+  .markdown-content li {
+    @apply font-normal text-[#4d4d4d];
+  }
+
+  .markdown-content a {
+    @apply text-[#e74c3c] no-underline;
+  }
+
+  .markdown-content a:hover {
+    @apply underline;
+  }
+
+  .markdown-content blockquote {
+    @apply border-l-4 border-[#e74c3c] pl-4 my-5 italic text-[#7f8c8d];
+  }
+
+  .markdown-content ul,
+  .markdown-content ol {
+    @apply my-2.5 ml-5 pl-0;
+  }
+
+  .markdown-content hr {
+    @apply border-0 border-t border-[#bdc3c7] my-12;
+  }
+
+  .markdown-content pre,
+  .markdown-content code {
+    @apply font-mono bg-[#f4f4f4] text-[#2c3e50] p-1.5 rounded;
+  }
+
+  .markdown-content img {
+    @apply mb-8;
+  }
+</style>

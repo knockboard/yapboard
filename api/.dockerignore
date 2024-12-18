@@ -1,0 +1,47 @@
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+*.env
+
+# Node
+node_modules/
+npm-debug.log
+build/
+dist/
+
+# Git
+.git
+.gitignore
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Model files (optional, depending on size)
+*.pt
+
+# Development files
+README.md
+docker-compose.yml
+Dockerfile
+
+# Testing and CI
+.github/
+.gitlab-ci.yml
+tests/

@@ -1,0 +1,55 @@
+---
+import Navbar from "../../components/Navbar.astro";
+import Layout from "../../layouts/Layout.astro";
+
+const allPosts = Object.entries(
+  import.meta.glob("./*.md", { eager: true })
+).map(([path, post]) => ({
+  url: path.replace("./", "/blogs/").replace(".md", ""),
+  frontmatter: (post as any).frontmatter,
+}));
+---
+
+<Layout>
+  <div class="w-full h-screen bg-[#fafaf8] overflow-y-auto">
+    <div class="max-w-[750px] mx-auto w-full flex flex-col gap-16 pb-8 px-2">
+      <Navbar />
+      <div class="border-b-2 pb-6">
+        <h1 class="text-2xl font-bold">Welcome to our yap section.</h1>
+        <span class="max-w-[500px] block">
+          Welcome to the Yapboard blog – sharing updates, tips, and deep dives
+          into our development process.
+        </span>
+      </div>
+      <ul class="w-full">
+        {
+          allPosts.map((post) => (
+            <li>
+              <a href={post.url} class="flex gap-6">
+                <div class="max-w-[200px] h-auto">
+                  <img
+                    class="w-full h-full object-cover object-center"
+                    src={post.frontmatter.image.url}
+                    alt={post.frontmatter.image.alt}
+                  />
+                </div>
+                <div>
+                  <h3 class="text-xl font-medium mb-2">
+                    {post.frontmatter.title}
+                  </h3>
+                  <p>{post.frontmatter.description}</p>
+                  <div class="inline-flex gap-4 items-center mt-2 text-secondary-foreground text-sm">
+                    <span>{post.frontmatter.author}</span>
+                    <time>
+                      {new Date(post.frontmatter.pubDate).toLocaleDateString()}
+                    </time>
+                  </div>
+                </div>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</Layout>

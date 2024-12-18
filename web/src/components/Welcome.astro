@@ -1,0 +1,112 @@
+---
+import Navbar from "./Navbar.astro";
+---
+
+<div class="w-full h-screen bg-[#fafaf8] overflow-y-auto">
+  <div class="max-w-[1080px] mx-auto w-full flex flex-col gap-16 pb-8 px-2">
+    <div class="flex flex-col items-center w-full gap-16">
+      <Navbar />
+
+      <div class="relative flex flex-col items-center w-full">
+        <img
+          src="/nyan-cat.gif"
+          class="sm:absolute right-0 w-[10rem] h-auto sm:-top-12 -scale-x-90"
+          alt="yapboard"
+        />
+        <h1 class="text-center text-6xl md:font-extrabold">AI POWERED</h1>
+        <h2 class="text-5xl md:font-extrabold md:text-7xl">WHITEBOARD.</h2>
+        <p class="mt-6 text-xl font-medium text-center max-w-[620px]">
+          Your whiteboard just leveled up with AI-powered brainstorming. A free
+          and instant collaborative whiteboarding tool.
+        </p>
+        <a
+          href="/app/"
+          class="px-5 py-2 mt-4 font-medium transition-all border border-black rounded-md hover:bg-black hover:text-white"
+        >
+          Get Started
+        </a>
+      </div>
+    </div>
+
+    <div class="relative w-full group">
+      <img
+        src="/pepe_o.webp"
+        class="absolute z-0 h-auto left-2 -top-9 max-w-20 group-hover:-top-[75px] transition-all"
+        alt="yapboard"
+      />
+      <div class="relative w-full overflow-hidden border-2 rounded-lg">
+        <img src="/banner.webp" class="w-full h-full" alt="yapboard" />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-16 py-14">
+      <div class="flex flex-col justify-between gap-4 md:flex-row h-fit">
+        <div class="h-fit">
+          <h3 class="text-4xl font-bold">CREATE.</h3>
+          <p class="mt-2 text-[1rem] font-normal">
+            Yapboard is your ultimate creative playground. With an infinite
+            canvas, intuitive tools, and advanced features, you can design,
+            collaborate, and bring ideas to life effortlessly.
+          </p>
+          <a
+            href="/app/"
+            class="block px-5 py-2 mt-4 font-medium transition-all border border-black rounded-md w-fit hover:bg-black hover:text-white"
+          >
+            Start Creating
+          </a>
+        </div>
+        <div
+          class="relative w-full overflow-hidden border-2 rounded-lg max-h-[380px]"
+        >
+          <img
+            src="/think.webp"
+            class="object-cover object-center w-full h-full"
+            alt="yapboard"
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-col-reverse justify-between gap-16 md:flex-row">
+        <div
+          class="relative w-full overflow-hidden border-2 rounded-lg max-h-[400px] object-center"
+        >
+          <img
+            src="/simple.webp"
+            alt="yapboard"
+            class="object-cover object-center w-full h-full"
+          />
+        </div>
+        <div>
+          <h3 class="text-4xl font-bold">SIMPLE.</h3>
+          <p class="mt-2 text-[1rem] font-normal">
+            Yapboard keeps it free, simple and instant, offering intuitive
+            shortcuts and a smart command palette to streamline your creativity.
+          </p>
+          <a
+            href="/app/"
+            class="block px-5 py-2 mt-4 font-medium transition-all border border-black rounded-md w-fit hover:bg-black hover:text-white"
+          >
+            Open Whiteboard
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="pb-4">
+      <h3 class="text-4xl font-normal md:text-7xl">
+        Ready to see what everyone’s talking about?
+      </h3>
+      <a
+        href="/app/"
+        class="block px-5 py-2 mt-8 font-medium transition-all border border-black rounded-md w-fit hover:bg-black hover:text-white"
+      >
+        You can, with Yapboard.
+      </a>
+    </div>
+  </div>
+  <div class="flex">
+    <div class="w-full h-2 bg-yellow-300"></div>
+    <div class="w-full h-2 bg-yellow-400"></div>
+    <div class="w-full h-2 bg-yellow-500"></div>
+  </div>
+</div>

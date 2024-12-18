@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Auth</title>
+  </head>
+  <body>
+    <section
+      class="flex flex-col items-center justify-center h-screen gap-8 overflow-y-auto"
+    >
+      <a
+        href="/"
+        class="max-w-40 h-auto rotate-[14deg]"
+        aria-details="homepage"
+      >
+        <img src="/wordart.png" class="w-full h-full" alt="yapboard" />
+      </a>
+      <div
+        class="flex flex-col items-center justify-center mx-auto overflow-hidden border-2 rounded-lg md:flex-row w-fit max-w-[850px]"
+      >
+        <slot />
+        <div class="w-full h-full bg-[#fdc83e]">
+          <img
+            src="/think.png"
+            class="object-cover object-center w-full h-full"
+            alt="yapboard"
+          />
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
