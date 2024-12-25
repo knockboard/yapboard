@@ -42,37 +42,54 @@ const Canvas: React.FC = () => {
     const centerX = canvas.width! / 2;
     const centerY = canvas.height! / 2;
 
-    const yapper = "/yapper.webp";
-    fabric.Image.fromURL(yapper).then((img) => {
-      img.set({
-        dirty: true,
-        scaleX: 0.5,
-        scaleY: 0.5,
-        left: centerX - (img.width! * 0.5) / 2,
-        top: centerY - 350,
-      });
-      img.set({
-        id: Math.floor(Math.random() * 100000000),
-      });
-      canvas.add(img);
-      setLogs(`Image added of ${img.width}x${img.height}  pixels.`, "info");
-    });
+    const loadCanvasData = async () => {
+      const jsonData = localStorage.getItem("yapboard");
+      const parsedJson = jsonData && JSON.parse(jsonData);
 
-    const logo = "/wordart.png";
-    fabric.Image.fromURL(logo).then((img) => {
-      img.set({
-        dirty: true,
-        scaleX: 0.5,
-        scaleY: 0.5,
-        left: centerX - (img.width! * 0.5) / 2,
-        top: centerY - 150,
-      });
-      img.set({
-        id: Math.floor(Math.random() * 100000000),
-      });
-      canvas.add(img);
-      setLogs(`Image added of ${img.width}x${img.height}  pixels.`, "info");
-    });
+      if (jsonData && parsedJson.objects.length) {
+        try {
+          await canvas.loadFromJSON(jsonData);
+          setLogs("Canvas data loaded from localStorage.", "info");
+        } catch (error) {
+          setLogs("Failed to load canvas data from localStorage.", "error");
+        }
+      } else {
+        const yapper = "/yapper.webp";
+        fabric.Image.fromURL(yapper).then((img) => {
+          img.set({
+            dirty: true,
+            scaleX: 0.5,
+            scaleY: 0.5,
+            left: centerX - (img.width! * 0.5) / 2,
+            top: centerY - 350,
+          });
+          img.set({
+            id: Math.floor(Math.random() * 100000000),
+          });
+          canvas.add(img);
+          setLogs(`Image added of ${img.width}x${img.height}  pixels.`, "info");
+        });
+
+        const logo = "/wordart.png";
+        fabric.Image.fromURL(logo).then((img) => {
+          img.set({
+            dirty: true,
+            scaleX: 0.5,
+            scaleY: 0.5,
+            left: centerX - (img.width! * 0.5) / 2,
+            top: centerY - 150,
+          });
+          img.set({
+            id: Math.floor(Math.random() * 100000000),
+          });
+          canvas.add(img);
+          setLogs(`Image added of ${img.width}x${img.height}  pixels.`, "info");
+        });
+      }
+      canvas.renderAll();
+    };
+
+    loadCanvasData();
 
     return () => {
       canvas.dispose();
@@ -305,8 +322,63 @@ const Canvas: React.FC = () => {
     };
   }, [fabricRef, fontFamily]);
 
+  useEffect(() => {
+    const canvas = fabricRef?.current;
+    if (!canvas) return;
+
+    const convertBlobToDataURL = (blob: Blob): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    };
+
+    const saveToLocalStorage = async () => {
+      const canvasObjects = canvas.getObjects();
+
+      await Promise.all(
+        canvasObjects.map(async (obj) => {
+          if (
+            obj.type === "image" &&
+            obj instanceof fabric.Image &&
+            obj._element &&
+            obj._element instanceof HTMLImageElement &&
+            obj._element.src.startsWith("blob:")
+          ) {
+            try {
+              const response = await fetch(obj._element.src);
+              const blob = await response.blob();
+              const base64DataUrl = await convertBlobToDataURL(blob);
+
+              obj._element.src = base64DataUrl;
+              obj.set({ src: base64DataUrl });
+            } catch (error) {
+              setLogs("Failed to save image", "error");
+            }
+          }
+          return obj;
+        })
+      );
+
+      const jsonData = JSON.stringify(canvas.toJSON());
+      localStorage.setItem("yapboard", jsonData);
+    };
+
+    canvas.on("object:added", saveToLocalStorage);
+    canvas.on("object:modified", saveToLocalStorage);
+    canvas.on("object:removed", saveToLocalStorage);
+
+    return () => {
+      canvas.off("object:added", saveToLocalStorage);
+      canvas.off("object:modified", saveToLocalStorage);
+      canvas.off("object:removed", saveToLocalStorage);
+    };
+  }, [fabricRef]);
+
   return (
-    <div className="flex flex-col items-center gap-4 overflow-hidden">
+    <div className="flex flex-col items-center h-screen w-screen gap-4 overflow-hidden">
       <div
         className="relative w-screen h-screen overflow-hidden border border-gray-300 rounded-lg"
         onWheel={handleMouseWheel}

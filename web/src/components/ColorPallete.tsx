@@ -95,9 +95,15 @@ export default function ColorPallete() {
       ["pencil", "text"].includes(toolSelected) ||
       toolType === "shape" ||
       (selectedObjectType &&
-        ["rect", "ellipse", "textbox", "line", "path", "triangle"].includes(
-          selectedObjectType
-        ))
+        [
+          "rect",
+          "ellipse",
+          "textbox",
+          "line",
+          "path",
+          "triangle",
+          "i-text",
+        ].includes(selectedObjectType))
     ) &&
     !isMultipleSelected
   )
