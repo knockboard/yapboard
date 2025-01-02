@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import * as fabric from "fabric";
 import useCanvasStore from "../store/canvasStore";
 import ZoomInOut from "./ZoomInOut";
 import useToolStore from "../store/toolStore";
 import useLogStore from "../store/logStore";
+import useCanvasSize from "../hooks/useCanvasSize";
 
 interface CustomFabricCanvas extends fabric.Canvas {
   isDragging?: boolean;
@@ -23,13 +24,87 @@ const Canvas: React.FC = () => {
     return false;
   }, [toolSelected]);
   const setLogs = useLogStore((state) => state.setLogs);
+  const { width, height } = useCanvasSize();
+  const undoStack = useRef<string[]>([]);
+  const redoStack = useRef<string[]>([]);
+  const MAX_STACK_SIZE = 50;
+  const skipNextSaveToHistory = useRef(false);
+
+  const saveState = (data: string) => {
+    if (skipNextSaveToHistory.current) {
+      skipNextSaveToHistory.current = false;
+      return;
+    }
+
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+
+    if (
+      undoStack.current.length === 0 ||
+      undoStack.current[undoStack.current.length - 1] !== data
+    ) {
+      undoStack.current.push(data);
+      if (undoStack.current.length > MAX_STACK_SIZE) {
+        undoStack.current.shift();
+      }
+
+      redoStack.current = [];
+      setLogs("State saved to undo stack.", "info");
+    }
+  };
+
+  const undo = async () => {
+    const canvas = fabricRef.current;
+    if (!canvas || undoStack.current.length <= 1) return;
+
+    const currentState = undoStack.current.pop();
+    if (!currentState) return;
+
+    redoStack.current.push(currentState);
+
+    if (redoStack.current.length > MAX_STACK_SIZE) {
+      redoStack.current.shift();
+    }
+
+    const previousState = undoStack.current[undoStack.current.length - 1];
+
+    try {
+      skipNextSaveToHistory.current = true;
+      await canvas.loadFromJSON(previousState);
+      canvas.renderAll();
+    } catch (error) {
+      setLogs("Error performing undo.", "error");
+      undoStack.current.push(currentState);
+      redoStack.current.pop();
+    }
+  };
+
+  const redo = async () => {
+    const canvas = fabricRef.current;
+    if (!canvas || redoStack.current.length === 0) return;
+
+    const nextState = redoStack.current.pop();
+    if (!nextState) return;
+
+    undoStack.current.push(nextState);
+
+    try {
+      skipNextSaveToHistory.current = true;
+      await canvas.loadFromJSON(nextState);
+      canvas.renderAll();
+    } catch (error) {
+      setLogs("Error performing redo.", "error");
+      redoStack.current.push(nextState);
+      undoStack.current.pop();
+    }
+  };
 
   useEffect(() => {
     if (!canvasRef.current) return;
 
     const canvas = new fabric.Canvas(canvasRef.current, {
-      width: window.innerWidth,
-      height: window.innerHeight,
+      width: width,
+      height: height,
       backgroundColor: "#f9fafb",
       hoverCursor: "grab",
       moveCursor: "grabbing",
@@ -94,7 +169,7 @@ const Canvas: React.FC = () => {
     return () => {
       canvas.dispose();
     };
-  }, [canvasRef]);
+  }, [canvasRef, height, width]);
 
   useEffect(() => {
     const handleDelete = (event: KeyboardEvent) => {
@@ -116,7 +191,7 @@ const Canvas: React.FC = () => {
 
         activeObjects.forEach((obj) => canvas.remove(obj));
         canvas.discardActiveObject();
-        canvas.requestRenderAll();
+        canvas.renderAll();
       }
     };
 
@@ -184,24 +259,8 @@ const Canvas: React.FC = () => {
     setZoomLevel(Math.round(newZoom * 100));
   };
 
-  const handleZoomIn = (e: React.MouseEvent): void => {
-    const point = {
-      x: e.clientX || (fabricRef.current?.width || 0) / 2,
-      y: e.clientY || (fabricRef.current?.height || 0) / 2,
-    };
-    zoomByPoint(point, 1.1);
-  };
-
-  const handleZoomOut = (e: React.MouseEvent): void => {
-    const point = {
-      x: e.clientX || (fabricRef.current?.width || 0) / 2,
-      y: e.clientY || (fabricRef.current?.height || 0) / 2,
-    };
-    zoomByPoint(point, 0.9);
-  };
-
   const handleMouseWheel = (event: React.WheelEvent): void => {
-    if (event.shiftKey) {
+    if (event.ctrlKey) {
       event.preventDefault();
       const point = {
         x: event.clientX,
@@ -212,11 +271,25 @@ const Canvas: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const preventCtrlScroll = (event: WheelEvent) => {
+      if (event.ctrlKey) {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener("wheel", preventCtrlScroll, { passive: false });
+
+    return () => {
+      window.removeEventListener("wheel", preventCtrlScroll);
+    };
+  }, []);
+
   const handleMouseDown = (event: React.MouseEvent): void => {
     const canvas = fabricRef.current;
     if (!canvas) return;
 
-    if (isPanMode || event.shiftKey) {
+    if (isPanMode || event.ctrlKey) {
       canvas.discardActiveObject();
       canvas.selection = false;
       canvas.forEachObject((obj) => {
@@ -262,6 +335,15 @@ const Canvas: React.FC = () => {
   };
 
   useEffect(() => {
+    const handleCopy = async (_: ClipboardEvent) => {
+      const canvas = fabricRef.current;
+      if (!canvas) return;
+
+      const selectedObjects = canvas.getActiveObjects();
+      const json = JSON.stringify(selectedObjects);
+      window.navigator.clipboard.writeText(json);
+    };
+
     const handlePaste = async (event: ClipboardEvent) => {
       const canvas = fabricRef.current;
       if (!canvas) return;
@@ -271,9 +353,9 @@ const Canvas: React.FC = () => {
 
       for (const item of clipboardItems) {
         if (item.type === "text/plain") {
-          const text = event.clipboardData?.getData("Text");
-          if (text) {
-            const textbox = new fabric.Textbox(text, {
+          const data = event.clipboardData?.getData("Text");
+          if (data) {
+            const textbox = new fabric.Textbox(data, {
               left: canvas.width! / 2,
               top: canvas.height! / 2,
               width: 300,
@@ -316,9 +398,11 @@ const Canvas: React.FC = () => {
     };
 
     window.addEventListener("paste", handlePaste);
+    // window.addEventListener("copy", handleCopy);
 
     return () => {
       window.removeEventListener("paste", handlePaste);
+      // window.removeEventListener("copy", handleCopy);
     };
   }, [fabricRef, fontFamily]);
 
@@ -364,6 +448,7 @@ const Canvas: React.FC = () => {
 
       const jsonData = JSON.stringify(canvas.toJSON());
       localStorage.setItem("yapboard", jsonData);
+      saveState(jsonData);
     };
 
     canvas.on("object:added", saveToLocalStorage);
@@ -374,6 +459,22 @@ const Canvas: React.FC = () => {
       canvas.off("object:added", saveToLocalStorage);
       canvas.off("object:modified", saveToLocalStorage);
       canvas.off("object:removed", saveToLocalStorage);
+    };
+  }, [fabricRef]);
+
+  useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === "z") {
+        undo();
+      } else if (event.ctrlKey && event.key === "y") {
+        redo();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeydown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeydown);
     };
   }, [fabricRef]);
 
@@ -390,7 +491,7 @@ const Canvas: React.FC = () => {
         <canvas id="canvas" className="w-screen h-screen" ref={setCanvasRef} />
       </div>
 
-      <ZoomInOut handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} />
+      <ZoomInOut zoomByPoint={zoomByPoint} />
     </div>
   );
 };
