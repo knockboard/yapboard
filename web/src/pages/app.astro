@@ -1,8 +1,60 @@
 ---
 import CanvasPage from "../components/CanvasPage";
-import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout>
-  <CanvasPage client:load />
-</Layout>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <title>Yapboard | Whiteboard App</title>
+    <meta
+      name="description"
+      content="Yapboard is an AI-powered simple and free instant whiteboard application with features like background removal and intuitive design."
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/ico" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Open Graph Meta Tags for Social Sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Yapboard | Whiteboard App" />
+    <meta
+      property="og:description"
+      content="Yapboard is an AI-powered simple and free instant whiteboard application with features like background removal and intuitive design."
+    />
+    <meta property="og:image" content="/banner.webp" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="Yapboard | Whiteboard App" />
+    <meta
+      property="twitter:description"
+      content="Yapboard is an AI-powered simple and free instant whiteboard application with features like background removal and intuitive design."
+    />
+    <meta name="twitter:image" content="/banner.webp" />
+
+    <!-- SEO and Performance -->
+    <meta
+      name="keywords"
+      content="Yapboard, whiteboard, collaborative tools, AI whiteboard, team collaboration, online whiteboard, free, canvas"
+    />
+    <meta name="author" content="Yapboard Team" />
+    <meta name="robots" content="index, follow" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <link
+      rel="canonical"
+      href="https://yapboard.chamanbudhathoki.com.np/app/"
+    />
+
+    <link rel="stylesheet" href="/styles/global.css" />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <CanvasPage client:only />
+  </body>
+</html>
