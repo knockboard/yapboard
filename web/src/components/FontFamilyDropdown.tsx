@@ -43,7 +43,7 @@ export default function FontFamilyDropdown({ toggleDropdown }: Props) {
 
     if (activeObjects.length) {
       activeObjects.forEach((obj) => {
-        if (obj.type === "textbox") {
+        if (["textbox", "i-text"].includes(obj.type)) {
           obj.set({
             fontFamily: fontFamily,
           });
@@ -63,7 +63,7 @@ export default function FontFamilyDropdown({ toggleDropdown }: Props) {
               `px-3 py-1 cursor-pointer hover:bg-gray-200 whitespace-nowrap `,
               {
                 "bg-gray-200": fontFamily === f.fontFamily,
-              }
+              },
             )}
             style={{ fontFamily: f.fontFamily }}
             onClick={() => {

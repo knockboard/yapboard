@@ -22,13 +22,16 @@ export default function Text() {
 
       const pointer = canvas.getPointer(event.e as MouseEvent);
 
-      const text = new fabric.IText("", {
+      const text = new fabric.Textbox("", {
         fill: selectedColor,
         top: pointer.y,
         left: pointer.x,
-        width: 180,
+        width: 300,
         fontFamily: fontFamily,
         editable: true,
+        splitByGrapheme: true,
+        lineHeight: 1.2,
+        textAlign: "center",
       });
 
       setTool("cursor", undefined);
@@ -58,7 +61,7 @@ export default function Text() {
         {
           "bg-primary": toolSelected === "text",
           "hover:bg-gray-100": toolSelected !== "text",
-        }
+        },
       )}
       onClick={() => {
         setTool("text", undefined);

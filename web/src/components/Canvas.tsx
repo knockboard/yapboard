@@ -182,7 +182,7 @@ const Canvas: React.FC = () => {
       if (activeObjects.length) {
         const isEditingTextbox = activeObjects.some((obj) => {
           // @ts-ignore
-          return obj.type === "i-text" && obj?.isEditing;
+          return ["textbox", "i-text"].includes(obj.type) && obj?.isEditing;
         });
 
         if (isEditingTextbox) {
@@ -237,7 +237,7 @@ const Canvas: React.FC = () => {
 
   const zoomByPoint = (
     point: { x: number; y: number },
-    factor: number
+    factor: number,
   ): void => {
     const canvas = fabricRef.current;
     if (!canvas) return;
@@ -363,6 +363,9 @@ const Canvas: React.FC = () => {
               fontFamily: fontFamily,
               fill: "#333",
               editable: true,
+              splitByGrapheme: true,
+              lineHeight: 1.2,
+              textAlign: "center",
             });
             canvas.add(textbox);
             canvas.setActiveObject(textbox);
@@ -390,7 +393,7 @@ const Canvas: React.FC = () => {
             canvas.setActiveObject(img);
             setLogs(
               `Image pasted of ${img.width}x${img.height}  pixels.`,
-              "info"
+              "info",
             );
           });
         }
@@ -443,7 +446,7 @@ const Canvas: React.FC = () => {
             }
           }
           return obj;
-        })
+        }),
       );
 
       const jsonData = JSON.stringify(canvas.toJSON());

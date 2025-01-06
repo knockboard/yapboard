@@ -63,10 +63,11 @@ async def remove_bg(file: UploadFile):
                 and result.masks is not None
                 and len(result.masks) > 0
             ):
-                for j, (mask,box) in enumerate(zip(result.masks.data, result.boxes.xyxy)):
+                for _, (mask, box) in enumerate(
+                    zip(result.masks.data, result.boxes.xyxy)
+                ):
                     mask = mask.numpy() * 255
-                    mask = cv2.resize(mask, (W, H)).astype(np.uint8)\
-
+                    mask = cv2.resize(mask, (W, H)).astype(np.uint8)
                     x1, y1, x2, y2 = map(int, box)
                     logger.info(f"Cropping to bounding box: {(x1, y1, x2, y2)}")
 
@@ -75,7 +76,6 @@ async def remove_bg(file: UploadFile):
                     rgba_cropped_image = cv2.cvtColor(cropped_img, cv2.COLOR_BGR2BGRA)
                     cropped_mask = mask[y1:y2, x1:x2]
                     rgba_cropped_image[:, :, 3] = cropped_mask
-
 
                     _, buffer = cv2.imencode(".png", rgba_cropped_image)
                     processed_images.append(BytesIO(buffer.tobytes()))

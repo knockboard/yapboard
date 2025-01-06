@@ -111,7 +111,8 @@ export default function ColorPallete() {
 
   return (
     <div className="absolute z-10 flex items-center px-2 pt-2 pb-3 -translate-x-1/2 border rounded-md bg-secondary bottom-20 left-1/2 border-border toolbar-shadow">
-      {selectedObjectType === "textbox" || toolSelected === "text" ? (
+      {["textbox", "i-text"].includes(String(selectedObjectType)) ||
+      toolSelected === "text" ? (
         <div className="relative flex w-full gap-1 border-r-2">
           <span
             onClick={() => setToggleFontDropdown((prev) => !prev)}
