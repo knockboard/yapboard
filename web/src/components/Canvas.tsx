@@ -176,13 +176,13 @@ const Canvas: React.FC = () => {
       const canvas = fabricRef.current;
       if (!canvas) return;
 
-      if (event.key !== "Delete") return;
+      if (event.key !== "Delete" && event.key !== "Backspace") return;
       const activeObjects = canvas.getActiveObjects();
 
       if (activeObjects.length) {
         const isEditingTextbox = activeObjects.some((obj) => {
           // @ts-ignore
-          return obj.type === "textbox" && obj?.isEditing;
+          return obj.type === "i-text" && obj?.isEditing;
         });
 
         if (isEditingTextbox) {
@@ -200,7 +200,7 @@ const Canvas: React.FC = () => {
     return () => {
       document.removeEventListener("keydown", handleDelete);
     };
-  }, [toolSelected, fabricRef]);
+  }, [fabricRef]);
 
   useEffect(() => {
     const canvas = fabricRef.current;
