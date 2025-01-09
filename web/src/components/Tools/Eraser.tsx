@@ -9,17 +9,23 @@ export default function Eraser() {
   const { fabricRef } = useCanvasStore();
   const { setTool } = useToolStore();
 
-  const initializeCanvasEvents = useCallback(() => {
-    const canvas = fabricRef.current;
-    if (!canvas || toolSelected !== "eraser") return;
-
+  const configureCanvas = useCallback((canvas: fabric.Canvas) => {
     canvas.defaultCursor = "crosshair";
     canvas.selection = false;
     canvas.discardActiveObject();
+
     canvas.getObjects().forEach((obj) => {
       obj.selectable = false;
+      obj.hoverCursor = "crosshair";
     });
+
     canvas.requestRenderAll();
+  }, []);
+
+  const initializeCanvasEvents = useCallback(() => {
+    const canvas = fabricRef.current;
+    if (!canvas || toolSelected !== "eraser") return;
+    configureCanvas(canvas);
 
     const itemsToDelete = new Set<fabric.Object>();
     let isMouseDown = false;
@@ -36,7 +42,7 @@ export default function Eraser() {
       });
       objectsToRemove.forEach((obj) => {
         if (!itemsToDelete.has(obj)) {
-          obj.opacity = 0.2;
+          obj.opacity = 0.3;
           itemsToDelete.add(obj);
         }
       });
@@ -58,8 +64,7 @@ export default function Eraser() {
       });
       itemsToDelete.clear();
       isMouseDown = false;
-      canvas.selection = false;
-      canvas.requestRenderAll();
+      configureCanvas(canvas);
     };
 
     canvas.on("mouse:down", handleMouseDown);
@@ -102,6 +107,7 @@ export default function Eraser() {
             src="/eraser.png"
             alt="yapboard eraser"
             className={cn("w-auto h-20 pointer-events-none")}
+            loading="lazy"
           />
         </div>
       </div>

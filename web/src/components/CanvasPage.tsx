@@ -4,12 +4,13 @@ import ObjectBar from "./ObjectBar";
 import StampsBar from "./StampsBar";
 import ToolBar from "./ToolBar";
 import MouseCoordinates from "./MouseCoordinates";
-// import UserMenu from "../../components/UserMenu";
+import UserMenu from "./UserMenu";
 
 export default function CanvasPage() {
   return (
     <>
       <Canvas />
+      <UserMenu />
       <MouseCoordinates />
       <ToolBar />
       <ObjectBar />
