@@ -2,7 +2,7 @@ import useToolStore from "../../store/toolStore";
 import { useEffect, useCallback } from "react";
 import useCanvasStore from "../../store/canvasStore";
 import { cn } from "../../lib/utils";
-import { TPointerEvent } from "fabric";
+import * as fabric from "fabric";
 
 export default function Eraser() {
   const toolSelected = useToolStore((state) => state.toolSelected);
@@ -13,31 +13,63 @@ export default function Eraser() {
     const canvas = fabricRef.current;
     if (!canvas || toolSelected !== "eraser") return;
 
-    canvas.isDrawingMode = false;
+    canvas.defaultCursor = "crosshair";
+    canvas.selection = false;
+    canvas.discardActiveObject();
+    canvas.getObjects().forEach((obj) => {
+      obj.selectable = false;
+    });
+    canvas.requestRenderAll();
 
-    const handleMouseMove = (event: { e: TPointerEvent }) => {
+    const itemsToDelete = new Set<fabric.Object>();
+    let isMouseDown = false;
+
+    const handleMouseDown = () => {
+      isMouseDown = true;
+    };
+
+    const handleMouseMove = (event: any) => {
+      if (!isMouseDown) return;
       const pointer = canvas.getPointer(event.e);
       const objectsToRemove = canvas.getObjects().filter((obj) => {
         return obj.containsPoint(pointer);
       });
       objectsToRemove.forEach((obj) => {
-        canvas.remove(obj);
+        if (!itemsToDelete.has(obj)) {
+          obj.opacity = 0.2;
+          itemsToDelete.add(obj);
+        }
       });
       canvas.requestRenderAll();
     };
 
-    canvas.on("mouse:down", () => {
-      canvas.on("mouse:move", handleMouseMove);
-    });
+    const handleMouseUp = (event: any) => {
+      const pointer = canvas.getPointer(event.e);
+      if (!itemsToDelete.size) {
+        const objectsToRemove = canvas.getObjects().filter((obj) => {
+          return obj.containsPoint(pointer);
+        });
+        objectsToRemove.forEach((obj: fabric.Object) => {
+          canvas.remove(obj);
+        });
+      }
+      itemsToDelete.forEach((obj: fabric.Object) => {
+        canvas.remove(obj);
+      });
+      itemsToDelete.clear();
+      isMouseDown = false;
+      canvas.selection = false;
+      canvas.requestRenderAll();
+    };
 
-    canvas.on("mouse:up", () => {
-      canvas.off("mouse:move", handleMouseMove);
-    });
+    canvas.on("mouse:down", handleMouseDown);
+    canvas.on("mouse:move", handleMouseMove);
+    canvas.on("mouse:up", handleMouseUp);
 
     return () => {
-      canvas.off("mouse:down");
+      canvas.off("mouse:down", handleMouseDown);
       canvas.off("mouse:move", handleMouseMove);
-      canvas.off("mouse:up");
+      canvas.off("mouse:up", handleMouseUp);
     };
   }, [toolSelected, fabricRef]);
 

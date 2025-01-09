@@ -300,7 +300,6 @@ const Canvas: React.FC = () => {
       canvas.isDragging = true;
       canvas.lastPosX = event.clientX;
       canvas.lastPosY = event.clientY;
-      canvas.selection = false;
     }
   };
 
@@ -335,14 +334,14 @@ const Canvas: React.FC = () => {
   };
 
   useEffect(() => {
-    const handleCopy = async (_: ClipboardEvent) => {
-      const canvas = fabricRef.current;
-      if (!canvas) return;
-
-      const selectedObjects = canvas.getActiveObjects();
-      const json = JSON.stringify(selectedObjects);
-      window.navigator.clipboard.writeText(json);
-    };
+    // const handleCopy = async (_: ClipboardEvent) => {
+    //   const canvas = fabricRef.current;
+    //   if (!canvas) return;
+    //
+    //   const selectedObjects = canvas.getActiveObjects();
+    //   const json = JSON.stringify(selectedObjects);
+    //   window.navigator.clipboard.writeText(json);
+    // };
 
     const handlePaste = async (event: ClipboardEvent) => {
       const canvas = fabricRef.current;
@@ -364,8 +363,6 @@ const Canvas: React.FC = () => {
               fill: "#333",
               editable: true,
               splitByGrapheme: true,
-              lineHeight: 1.2,
-              textAlign: "center",
             });
             canvas.add(textbox);
             canvas.setActiveObject(textbox);

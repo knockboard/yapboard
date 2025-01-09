@@ -11,7 +11,7 @@ import ColorPallete from "./ColorPallete";
 import Image from "./Tools/Image";
 import Text from "./Tools/Text";
 import Stamp from "./Tools/Stamp";
-// import Eraser from "./Tools/Eraser";
+import Eraser from "./Tools/Eraser";
 
 export default function ToolBar() {
   const toolSelected = useToolStore((state) => state.toolSelected);
@@ -61,7 +61,7 @@ export default function ToolBar() {
 
         <div className="flex gap-0 border-r border-border">
           <Pencil />
-          {/* <Eraser /> */}
+          <Eraser />
 
           <div
             className={cn("px-1 transition-all hover:bg-gray-100 group w-fit", {

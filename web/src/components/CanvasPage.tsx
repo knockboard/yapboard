@@ -10,7 +10,6 @@ export default function CanvasPage() {
   return (
     <>
       <Canvas />
-      {/* <UserMenu /> */}
       <MouseCoordinates />
       <ToolBar />
       <ObjectBar />
