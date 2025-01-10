@@ -3,7 +3,7 @@ import Logger from "./Logger";
 import ObjectBar from "./ObjectBar";
 import StampsBar from "./StampsBar";
 import ToolBar from "./ToolBar";
-import MouseCoordinates from "./MouseCoordinates";
+import FpsStat from "./FpsStat";
 import UserMenu from "./UserMenu";
 
 export default function CanvasPage() {
@@ -11,7 +11,7 @@ export default function CanvasPage() {
     <>
       <Canvas />
       <UserMenu />
-      <MouseCoordinates />
+      <FpsStat />
       <ToolBar />
       <ObjectBar />
       <StampsBar />
