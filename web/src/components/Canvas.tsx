@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import * as fabric from "fabric";
 import useCanvasStore from "../store/canvasStore";
 import ZoomInOut from "./ZoomInOut";
@@ -23,6 +23,7 @@ const Canvas: React.FC = () => {
     if (toolSelected === "hand") return true;
     return false;
   }, [toolSelected]);
+  const [spacePressed, setSpacePressed] = useState(false);
   const setLogs = useLogStore((state) => state.setLogs);
   const { width, height } = useCanvasSize();
   const undoStack = useRef<string[]>([]);
@@ -272,29 +273,51 @@ const Canvas: React.FC = () => {
   };
 
   useEffect(() => {
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+
     const preventCtrlScroll = (event: WheelEvent) => {
       if (event.ctrlKey) {
         event.preventDefault();
       }
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code === "Space") {
+        canvas.defaultCursor = "move";
+        setSpacePressed(true);
+      }
+    };
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.code === "Space") {
+        setSpacePressed(false);
+        canvas.defaultCursor = "default";
+      }
+    };
+
     window.addEventListener("wheel", preventCtrlScroll, { passive: false });
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 
     return () => {
       window.removeEventListener("wheel", preventCtrlScroll);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
     };
-  }, []);
+  }, [fabricRef]);
 
   const handleMouseDown = (event: React.MouseEvent): void => {
     const canvas = fabricRef.current;
     if (!canvas) return;
 
-    if (isPanMode || event.ctrlKey) {
+    if (isPanMode || spacePressed) {
       canvas.discardActiveObject();
       canvas.selection = false;
       canvas.forEachObject((obj) => {
         obj.selectable = false;
       });
+      canvas.defaultCursor = "move";
       canvas.renderAll();
 
       canvas.isDragging = true;
@@ -313,6 +336,7 @@ const Canvas: React.FC = () => {
     vpt[4] += event.clientX - (canvas.lastPosX || 0);
     vpt[5] += event.clientY - (canvas.lastPosY || 0);
 
+    canvas.defaultCursor = "move";
     canvas.requestRenderAll();
     canvas.lastPosX = event.clientX;
     canvas.lastPosY = event.clientY;
@@ -330,6 +354,7 @@ const Canvas: React.FC = () => {
       obj.hoverCursor = "grab";
       obj.moveCursor = "grabbing";
     });
+    canvas.defaultCursor = "default";
     canvas.renderAll();
   };
 
