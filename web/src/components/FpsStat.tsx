@@ -9,7 +9,7 @@ export default function FpsStat() {
 
   const bg = "#21351a";
   const fg = "#6edc21";
-  const graph_bg = "#28481b";
+  const graph_bg = "#385b2c";
 
   const PR = Math.round(window.devicePixelRatio || 1);
   const WIDTH = 100 * PR;
