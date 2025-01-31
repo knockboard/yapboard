@@ -107,7 +107,6 @@ export default function Eraser() {
             src="/eraser.png"
             alt="yapboard eraser"
             className={cn("w-auto h-20 pointer-events-none")}
-            loading="lazy"
           />
         </div>
       </div>

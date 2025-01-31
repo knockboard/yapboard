@@ -1,5 +1,10 @@
 ---
+import { Image } from "astro:assets";
 import Navbar from "./Navbar.astro";
+import PepeOImg from "../assets/pepe_o.webp";
+import BannerImg from "../assets/banner.webp";
+import ThinkImg from "../assets/think.webp";
+import SimpleImg from "../assets/simple.webp";
 ---
 
 <div class="w-full h-screen bg-[#fafaf8] overflow-y-auto">
@@ -29,13 +34,19 @@ import Navbar from "./Navbar.astro";
     </div>
 
     <div class="relative w-full group">
-      <img
-        src="/pepe_o.webp"
+      <Image
+        src={PepeOImg}
         class="absolute z-0 h-auto left-2 -top-9 max-w-20 group-hover:-top-[75px] transition-all"
         alt="yapboard"
+        loading="eager"
       />
       <div class="relative w-full overflow-hidden border-2 rounded-lg">
-        <img src="/banner.webp" class="w-full h-full" alt="yapboard" />
+        <Image
+          src={BannerImg}
+          loading="eager"
+          class="w-full h-full"
+          alt="yapboard banner"
+        />
       </div>
     </div>
 
@@ -58,10 +69,11 @@ import Navbar from "./Navbar.astro";
         <div
           class="relative w-full overflow-hidden border-2 rounded-lg max-h-[380px]"
         >
-          <img
-            src="/think.webp"
+          <Image
+            src={ThinkImg}
+            loading="lazy"
             class="object-cover object-center w-full h-full"
-            alt="yapboard"
+            alt="yapboard whiteboard app"
           />
         </div>
       </div>
@@ -70,9 +82,10 @@ import Navbar from "./Navbar.astro";
         <div
           class="relative w-full overflow-hidden border-2 rounded-lg max-h-[400px] object-center"
         >
-          <img
-            src="/simple.webp"
-            alt="yapboard"
+          <Image
+            src={SimpleImg}
+            loading="lazy"
+            alt="yapboard whiteboard"
             class="object-cover object-center w-full h-full"
           />
         </div>
