@@ -3,6 +3,7 @@ import { Menu } from "lucide-react";
 import * as fabric from "fabric";
 import useCanvasStore from "../store/canvasStore";
 import useLogStore from "../store/logStore";
+import useUserStore from "../store/userStore";
 
 export default function UserMenu() {
   const fabricRef = useCanvasStore((state) => state.fabricRef);
@@ -10,6 +11,7 @@ export default function UserMenu() {
   const [isOpen, setOpen] = useState<boolean>(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const clearUser = useUserStore((state) => state.clearUser);
 
   const exportImage = () => {
     const canvas = fabricRef.current;
@@ -102,19 +104,19 @@ export default function UserMenu() {
           className="absolute flex flex-col p-2 rounded-md left-2 top-12 border-2 bg-white z-50 min-w-24"
           ref={menuRef}
         >
-          <span className="p-1 px-2 rounded-md cursor-pointer w-full min-w-24 hover:bg-slate-200 text-secondary-foreground text-sm">
+          {/* <span className="p-1 px-2 rounded-md cursor-pointer w-full min-w-24 hover:bg-slate-200 text-secondary-foreground text-sm">
             Open
           </span>
           <span className="p-1 px-2 rounded-md cursor-pointer w-full min-w-24 hover:bg-slate-200 text-secondary-foreground text-sm">
             Save to...
-          </span>
+          </span> */}
           <span
             className="p-1 px-2 rounded-md cursor-pointer w-full min-w-24 hover:bg-slate-200 text-secondary-foreground text-sm"
             onClick={exportImage}
           >
             Export image
           </span>
-          <span className="w-full h-[1px] bg-border my-[3px]" />
+          {/* <span className="w-full h-[1px] bg-border my-[3px]" />
           <span className="p-1 px-2 rounded-md cursor-pointer w-full min-w-24 hover:bg-slate-200 text-secondary-foreground text-sm">
             Toggle grid
           </span>
@@ -123,16 +125,16 @@ export default function UserMenu() {
           </span>
           <span className="p-1 px-2 rounded-md cursor-pointer w-full min-w-24 hover:bg-slate-200 text-secondary-foreground text-sm">
             Shortcuts & help
-          </span>
+          </span> */}
           <span
             onClick={resetCanvas}
             className="p-1 px-2 rounded-md cursor-pointer w-full min-w-24 hover:bg-slate-200 text-secondary-foreground text-sm"
           >
             Reset the canvas
           </span>
-          <span className="p-1 px-2 rounded-md cursor-pointer w-full min-w-24 hover:bg-slate-200 text-secondary-foreground text-sm">
+          {/* <span className="p-1 px-2 rounded-md cursor-pointer w-full min-w-24 hover:bg-slate-200 text-secondary-foreground text-sm">
             Theme
-          </span>
+          </span> */}
           <span className="w-full h-[1px] bg-border my-[3px]" />
           <span className="p-1 px-2 rounded-md cursor-pointer w-full min-w-24 hover:bg-slate-200 text-secondary-foreground text-sm">
             Terms of service
@@ -140,9 +142,18 @@ export default function UserMenu() {
           <span className="p-1 px-2 rounded-md cursor-pointer w-full min-w-24 hover:bg-slate-200 text-secondary-foreground text-sm">
             Privacy Policy
           </span>
-          <span className="w-full h-[1px] bg-border my-[3px]" />
           <span className="p-1 px-2 rounded-md cursor-pointer w-full min-w-24 hover:bg-slate-200 text-secondary-foreground text-sm">
             About yapboard
+          </span>
+          <span className="w-full h-[1px] bg-border my-[3px]" />
+          <span
+            className="p-1 px-2 rounded-md cursor-pointer w-full min-w-24 hover:bg-slate-200 text-secondary-foreground text-sm"
+            onClick={() => {
+              clearUser();
+              window.location.href = "/";
+            }}
+          >
+            Logout
           </span>
         </div>
       ) : null}

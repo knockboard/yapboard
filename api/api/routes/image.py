@@ -1,12 +1,20 @@
 import asyncio
+import os
+import uuid
 from io import BytesIO
 
 import cv2
 import numpy as np
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from database.database import get_db
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 from logger import logger
+from models.image import Image
+from models.user import User
+from sqlalchemy.orm import Session
 from ultralytics import YOLO
+
+from api import dependencies
 
 router = APIRouter(tags=["image"])
 
@@ -18,11 +26,18 @@ except Exception as e:
     logger.error(f"Failed to load YOLO model: {e}")
     raise RuntimeError(f"Error loading YOLO model: {e}")
 
+PROCESSED_IMAGE_DIR = "./processed_images"
+os.makedirs(PROCESSED_IMAGE_DIR, exist_ok=True)
+
 
 @router.post("/process-image")
-async def process_image(file: UploadFile = File(...)):
+async def process_image(
+    file: UploadFile = File(...),
+    current_user: User = Depends(dependencies.get_current_user),
+    db: Session = Depends(get_db),
+):
     try:
-        return await asyncio.wait_for(remove_bg(file), timeout=60)
+        return await asyncio.wait_for(remove_bg(file, current_user, db), timeout=60)
     except asyncio.TimeoutError:
         logger.warning("Image processing timed out")
         raise HTTPException(status_code=408, detail="Request timed out")
@@ -31,8 +46,7 @@ async def process_image(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
 
 
-async def remove_bg(file: UploadFile):
-
+async def remove_bg(file: UploadFile, current_user: User, db: Session):
     allowed_types = ["image/jpeg", "image/png", "image/webp"]
     if file.content_type not in allowed_types:
         logger.warning(f"Invalid file type uploaded: {file.content_type}")
@@ -63,7 +77,7 @@ async def remove_bg(file: UploadFile):
                 and result.masks is not None
                 and len(result.masks) > 0
             ):
-                for _, (mask, box) in enumerate(
+                for j, (mask, box) in enumerate(
                     zip(result.masks.data, result.boxes.xyxy)
                 ):
                     mask = mask.numpy() * 255
@@ -78,6 +92,16 @@ async def remove_bg(file: UploadFile):
                     rgba_cropped_image[:, :, 3] = cropped_mask
 
                     _, buffer = cv2.imencode(".png", rgba_cropped_image)
+                    random_name = str(uuid.uuid4()) + ".png"
+                    file_path = os.path.join(PROCESSED_IMAGE_DIR, random_name)
+                    cv2.imwrite(file_path, rgba_cropped_image)
+                    new_image = Image(
+                        name=random_name,
+                        user_id=current_user.id,
+                    )
+                    db.add(new_image)
+                    db.commit()
+
                     processed_images.append(BytesIO(buffer.tobytes()))
 
         if processed_images:
@@ -101,3 +125,17 @@ async def remove_bg(file: UploadFile):
 @router.get("/health")
 async def health_check():
     return {"status": "healthy", "model_loaded": model is not None}
+
+
+@router.get("/current-user/images", response_model=list[str])
+async def get_images_for_user(
+    current_user: User = Depends(dependencies.get_current_user),
+    db: Session = Depends(get_db),
+):
+    images = db.query(Image).filter(Image.user_id == current_user.id).all()
+
+    if not images:
+        raise HTTPException(status_code=404, detail="No images found for this user.")
+
+    image_names = [image.name for image in images]
+    return image_names

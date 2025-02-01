@@ -1,4 +1,4 @@
-import { Hand, MousePointer2, Plus } from "lucide-react";
+import { Hand, MousePointer2 } from "lucide-react";
 import useToolStore from "../store/toolStore";
 import { cn } from "../lib/utils";
 import useCanvasStore from "../store/canvasStore";
@@ -12,6 +12,7 @@ import Image from "./Tools/Image";
 import Text from "./Tools/Text";
 import Stamp from "./Tools/Stamp";
 import Eraser from "./Tools/Eraser";
+import SavedImages from "./Tools/SavedImages";
 
 export default function ToolBar() {
   const toolSelected = useToolStore((state) => state.toolSelected);
@@ -90,9 +91,7 @@ export default function ToolBar() {
         </div>
 
         <div className="flex items-center justify-center h-full gap-3 px-4">
-          <div className="p-1 overflow-hidden border rounded-md border-border hover:bg-gray-100">
-            <Plus size={34} strokeWidth={1} />
-          </div>
+          <SavedImages />
         </div>
       </div>
       <ColorPallete />

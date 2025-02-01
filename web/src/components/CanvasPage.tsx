@@ -5,10 +5,11 @@ import StampsBar from "./StampsBar";
 import ToolBar from "./ToolBar";
 import FpsStat from "./FpsStat";
 import UserMenu from "./UserMenu";
+import ProtectedRoutes from "./ProtectedRoutes";
 
 export default function CanvasPage() {
   return (
-    <>
+    <ProtectedRoutes>
       <Canvas />
       <UserMenu />
       <FpsStat />
@@ -16,6 +17,6 @@ export default function CanvasPage() {
       <ObjectBar />
       <StampsBar />
       <Logger />
-    </>
+    </ProtectedRoutes>
   );
 }

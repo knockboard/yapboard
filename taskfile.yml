@@ -1,0 +1,22 @@
+version: "3"
+
+tasks:
+  api-dev:
+    cmds:
+      - cd api && uvicorn main:app --reload
+
+  web-dev:
+    cmds:
+      - cd web && npm run dev
+
+  build-web:
+    cmds:
+      - cd web && npm run build
+
+  build-docker:
+    cmds:
+      - docker build -t chamanbravo/yapboard .
+
+  publish:
+    cmds:
+      - docker image push chamanbravo/yaboard

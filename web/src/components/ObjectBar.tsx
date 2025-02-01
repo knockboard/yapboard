@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import * as fabric from "fabric";
 import useLogStore from "../store/logStore";
+import useUserStore from "../store/userStore";
 
 export default function ObjectBar() {
   const { fabricRef } = useCanvasStore();
@@ -29,6 +30,7 @@ export default function ObjectBar() {
     { x: number; y: number } | undefined
   >(undefined);
   const setLogs = useLogStore((state) => state.setLogs);
+  const user = useUserStore((state) => state.user);
 
   const handleSelectionCleared = () => {
     setSelectedObjectType(undefined);
@@ -217,7 +219,10 @@ export default function ObjectBar() {
     formData.append("file", file);
 
     try {
-      const response = await fetch("/api/process-image/", {
+      const response = await fetch("/api/process-image", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
         method: "POST",
         body: formData,
       });

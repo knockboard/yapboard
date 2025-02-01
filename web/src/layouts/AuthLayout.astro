@@ -1,0 +1,81 @@
+---
+import { Image } from "astro:assets";
+import Navbar from "../components/Navbar.astro";
+import ThinkImage from "../assets/think.webp";
+
+const { title, description, url } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <title>{title}</title>
+
+    <meta name="description" content={description} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/ico" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Open Graph Meta Tags for Social Sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="/banner.webp" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content="/banner.webp" />
+
+    <!-- SEO and Performance -->
+    <meta
+      name="keywords"
+      content="Yapboard, whiteboard, collaborative tools, AI whiteboard, team collaboration, online whiteboard, free"
+    />
+    <meta name="author" content="Yapboard Team" />
+    <meta name="robots" content="index, follow" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <link rel="canonical" href={url} />
+
+    <link rel="stylesheet" href="/styles/global.css" />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <div class="w-full h-screen bg-[#fafaf8] overflow-y-auto">
+      <div class="max-w-[750px] mx-auto w-full flex flex-col gap-6 pb-8 px-2">
+        <Navbar />
+        <section
+          class="flex flex-col items-center justify-center gap-8 overflow-y-auto dark:bg-gray-900 mt-6"
+        >
+          <a href="/" class="max-w-40 rotate-[14deg]" title="yapboard wordart">
+            <img
+              src="/wordart.png"
+              alt="yapboard wordart"
+              class="w-full h-full"
+            />
+          </a>
+          <div
+            class="flex flex-col items-center justify-center mx-auto overflow-hidden border-2 rounded-lg md:flex-row w-fit max-w-[850px] py-4"
+          >
+            <slot />
+            <div class="w-full h-full max-w-[350px] max-h-[350px] bg-[#fdc83e]">
+              <Image
+                alt="yapboard think whiteborad"
+                src={ThinkImage}
+                class="object-cover object-center w-full h-full"
+                loading="eager"
+              />
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>
